@@ -17,7 +17,8 @@ async function initializeDB(retries = 5, delay = 3000) {
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
                     name VARCHAR(100) NOT NULL,
-                    email VARCHAR(100) UNIQUE NOT NULL
+                    email VARCHAR(100) UNIQUE NOT NULL,
+                    password VARCHAR(100) NOT NULL
                 );
             `);
             
@@ -38,11 +39,11 @@ async function initializeDB(retries = 5, delay = 3000) {
     return false;
 }
 
-async function createUser(name, email) {
+async function createUser(name, email, password) {
     try {
         const insertResult = await pool.query(
-            "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *",
-            [name, email]
+            "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
+            [name, email, password]
         );
         
         return insertResult.rows[0];
@@ -58,4 +59,17 @@ async function createUser(name, email) {
     }
 }
 
-module.exports = { pool, initializeDB, createUser };
+async function findUser(email) {
+    try {
+        const result = await pool.query(
+            "SELECT * FROM users WHERE email = $1",
+            [email]
+        );
+        return result.rows.length > 0 ? result.rows[0] : null;
+    } catch (error) {
+        console.error("Error finding user by email:", error);
+        throw error;
+    }
+}
+
+module.exports = { pool, initializeDB, createUser, findUser };

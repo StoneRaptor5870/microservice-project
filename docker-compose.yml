@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres_db:
@@ -104,6 +102,7 @@ services:
       KAFKA_BROKER: ${KAFKA_BROKER}
       KAFKA_GROUP_USER: ${KAFKA_GROUP_USER}
       PORT_USER: ${PORT_USER}
+      JSONSECRET: ${JSONSECRET}
     depends_on:
       postgres_db:
         condition: service_healthy
@@ -124,6 +123,7 @@ services:
       KAFKA_BROKER: ${KAFKA_BROKER}
       KAFKA_GROUP_PARKING: ${KAFKA_GROUP_PARKING}
       PORT_PARKING: ${PORT_PARKING}
+      JSONSECRET: ${JSONSECRET}
     depends_on:
       mongo_db:
         condition: service_healthy

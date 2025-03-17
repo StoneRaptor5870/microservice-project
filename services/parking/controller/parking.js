@@ -2,7 +2,8 @@ const { publishMessage } = require('../utils/kafka');
 const { Parking } = require('../database/db');
 
 const reserveSlot = async (req, res) => {
-    const { slotId, userId } = req.body;
+    const userId = req.user.id;
+    const { slotId } = req.body;
 
     if (!slotId || !userId) {
         return res.status(400).json({
