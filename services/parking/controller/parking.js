@@ -1,5 +1,5 @@
-const { publishMessage } = require('../kafka');
-const { Parking } = require('../db');
+const { publishMessage } = require('../utils/kafka');
+const { Parking } = require('../database/db');
 
 const reserveSlot = async (req, res) => {
     const { slotId, userId } = req.body;

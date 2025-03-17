@@ -1,6 +1,6 @@
 const express = require("express");
-const { connectKafka } = require("./kafka");
-const { initializeDB } = require("./db");
+const { connectKafka } = require("./utils/kafka");
+const { initializeDB } = require("./database/db");
 const userRoutes = require('./routes/user')
 
 const app = express();

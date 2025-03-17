@@ -1,5 +1,5 @@
-const { createUser } = require("../db");
-const { publishMessage } = require("../kafka");
+const { createUser } = require("../database/db");
+const { publishMessage } = require("../utils/kafka");
 
 const register = async (req, res) => {
     try {

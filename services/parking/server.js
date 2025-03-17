@@ -1,7 +1,8 @@
 const express = require('express');
-const { connectKafka, subscribeToTopic } = require('./kafka');
-const { connectDB } = require('./db');
+const { connectKafka, subscribeToTopic } = require('./utils/kafka');
+const { connectDB } = require('./database/db');
 const parkingRoutes = require('./routes/parking')
+const { handleUserRegistered } = require('./utils/KafkaHandlers')
 
 const app = express();
 app.use(express.json());
@@ -32,12 +33,6 @@ async function initializeServices() {
         console.error("❌ Failed to initialize services:", error);
         return false;
     }
-}
-
-// Kafka message handlers
-async function handleUserRegistered(message) {
-    console.log(`New user registered: ${message.name} (ID: ${message.id})`);
-    // business logic for new user
 }
 
 // API Routes
