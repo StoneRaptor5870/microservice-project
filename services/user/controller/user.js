@@ -1,13 +1,13 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { createUser, findUser } = require("../database/db");
+const { createUser, findUser, promotion } = require("../database/db");
 const { publishMessage } = require("../utils/kafka");
 
 const register = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, phone } = req.body;
 
-        if (!name || !email || !password) {
+        if (!name || !email || !password, !phone) {
             return res.status(400).json({
                 success: false,
                 message: "Name and email are required"
@@ -23,7 +23,7 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         // Create user in database
-        const user = await createUser(name, email, hashedPassword);
+        const user = await createUser(name, email, hashedPassword, phone, "user");
 
         // Publish event to Kafka
         await publishMessage("user_registered", {
@@ -34,7 +34,7 @@ const register = async (req, res) => {
         });
 
         const token = jwt.sign(
-            { email: user.email, id: user.id },
+            { email: user.email, id: user.id, role: user.role },
             process.env.JSONSECRET,
             {
                 expiresIn: '1h',
@@ -56,7 +56,7 @@ const register = async (req, res) => {
     }
 };
 
-const signin = async (req, res) => {
+const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -76,7 +76,7 @@ const signin = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { email: existingUser.email, id: existingUser.id },
+            { email: existingUser.email, id: existingUser.id, role: user.role },
             process.env.JSONSECRET,
             {
                 expiresIn: '1h',
@@ -99,4 +99,23 @@ const signin = async (req, res) => {
     }
 }
 
-module.exports = { register, signin };
+async function promoteToAdmin(req, res) {
+    const { userId } = req.params;
+
+    try {
+        await promotion(userId);
+        res.json({ message: "User promoted to admin successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+}
+
+const getUser = async (req, res) => {
+    res.send("Hello from me.")
+}
+
+const updateUser = async (req, res) => {}
+
+const deleteUser = async (req, res) => {}
+
+module.exports = { register, login, getUser, updateUser, deleteUser, promoteToAdmin };
