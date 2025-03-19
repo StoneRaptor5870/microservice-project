@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { createUser, findUser, promotion } = require("../database/db");
+const { createUser, findUser } = require("../database/db");
 const { publishMessage } = require("../utils/kafka");
 
 const register = async (req, res) => {
@@ -63,7 +63,7 @@ const login = async (req, res) => {
         const existingUser = await findUser(email);
 
         if (!existingUser) {
-            return res.status(400).json({ message: "User already exists." });
+            return res.status(404).json({ message: "User doesn't exists." });
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -76,7 +76,7 @@ const login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { email: existingUser.email, id: existingUser.id, role: user.role },
+            { email: existingUser.email, id: existingUser.id, role: existingUser.role },
             process.env.JSONSECRET,
             {
                 expiresIn: '1h',
@@ -99,23 +99,24 @@ const login = async (req, res) => {
     }
 }
 
-async function promoteToAdmin(req, res) {
-    const { userId } = req.params;
-
-    try {
-        await promotion(userId);
-        res.json({ message: "User promoted to admin successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error });
-    }
-}
-
 const getUser = async (req, res) => {
     res.send("Hello from me.")
 }
 
-const updateUser = async (req, res) => {}
+const updateUser = async (req, res) => { }
 
-const deleteUser = async (req, res) => {}
+const forgotPassword = async (req, res) => { }
 
-module.exports = { register, login, getUser, updateUser, deleteUser, promoteToAdmin };
+const updatePassword = async (req, res) => { }
+
+const uploadProfilePicture = async (req, res) => { }
+
+module.exports = {
+    register,
+    login,
+    getUser,
+    updateUser,
+    forgotPassword,
+    updatePassword,
+    uploadProfilePicture
+};

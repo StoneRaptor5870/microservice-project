@@ -32,18 +32,48 @@ const connectDB = async (retries = 5, delay = 3000) => {
 
 const ParkingSchema = new mongoose.Schema({
     userId: { type: Number, required: true },
-    slotId: { type: Number, required: true },
+    garageId: { type: mongoose.Schema.Types.ObjectId, ref: "Garage", required: true },
+    slotId: { type: mongoose.Schema.Types.ObjectId, ref: "Slot", required: true },
+    vehicleId: { type: Number, required: true },
     status: { 
         type: String, 
         required: true,
         enum: ['reserved', 'occupied', 'available', 'maintenance']
     },
     assignedAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    updatedAt: { type: Date, default: Date.now },
+    pricePerHour: { type: Number, required: true },
+    totalCharge: { type: Number },
+    valetAssigned: { type: Number},
 });
+
+const GarageSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    location: {
+        latitude: { type: Number, required: true },
+        longitude: { type: Number, required: true }
+    },
+    totalSlots: { type: Number, required: true },
+    availableSlots: { type: Number, required: true },
+    slotTypes: [{ type: String, enum: ['compact', 'SUV', 'EV', 'bike', 'handicap'] }],
+    pricePerHour: { type: Number, required: true }
+});
+
+const SlotSchema = new mongoose.Schema({
+    garageId: { type: mongoose.Schema.Types.ObjectId, ref: "Garage", required: true },
+    slotNumber: { type: Number, required: true },
+    status: { 
+        type: String, 
+        required: true, 
+        enum: ["available", "reserved", "occupied", "maintenance"]
+    }
+});
+
 
 ParkingSchema.index({ slotId: 1, status: 1 });
 
 const Parking = mongoose.model("Parking", ParkingSchema);
+const Garage = mongoose.model("Garage", GarageSchema);
+const Slot = mongoose.model("Slot", SlotSchema);
 
-module.exports = { connectDB, Parking };
+module.exports = { connectDB, Parking, Garage, Slot };

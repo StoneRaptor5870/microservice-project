@@ -1,7 +1,7 @@
 const express = require("express");
 const { connectKafka } = require("./utils/kafka");
 const { initializeDB } = require("./database/db");
-const userRoutes = require('./routes/user')
+const routes = require('./routes/routes')
 
 const app = express();
 app.use(express.json());
@@ -31,7 +31,7 @@ async function initializeServices() {
 }
 
 // API Routes
-app.use('/api/v1', userRoutes);
+app.use('/api/v1', routes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
