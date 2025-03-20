@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { authenticateUser, authorizeRole } = require('../middleware/auth');
-const { register, login, getUser, updateUser, forgotPassword, updatePassword, uploadProfilePicture } = require('../controller/user');
+const { register, login, getUser, updateUser, forgotPassword, resetPassword } = require('../controller/user');
 const { addVehicle, getUserVehicles, removeVehicle, getVehicleById, updateVehicle } = require('../controller/vehicle');
 const { promoteToAdmin, getAllUsers, getUserById, updateUserById, demoteToUser, deleteUser } = require('../controller/admin');
 
@@ -9,12 +9,12 @@ const router = Router();
 // Users
 router.post('/login', login);
 router.post('/register', register);
+router.post('/users/forgot-password', forgotPassword);
+router.put('/users/reset-password', resetPassword);
 
 router.get('/users/me', authenticateUser, getUser);
 router.put('/users/me', authenticateUser, updateUser);
-router.post('/users/forgot-password', forgotPassword);
-router.put('/users/me/password', authenticateUser, updatePassword);
-router.post('/users/me/profile-picture', authenticateUser, uploadProfilePicture);
+// router.post('/users/me/profile-picture', authenticateUser, uploadProfilePicture);
 
 // Admin
 router.get('/admin/users', authenticateUser, authorizeRole("admin"), getAllUsers);

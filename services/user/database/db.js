@@ -1,5 +1,5 @@
 const { Pool } = require("pg");
-const { CREATE_USERS_TABLE, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE } = require("./queries");
+const { UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, CREATE_USERS_TABLE, FIND_USER_BY_ID, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE } = require("./queries");
 
 const pool = new Pool({
     user: process.env.POSTGRES_USER,
@@ -98,6 +98,36 @@ async function findUser(email) {
     }
 }
 
+async function profileInfo(id) {
+    try {
+        const result = await pool.query(FIND_USER_BY_ID, [id]);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    } catch (error) {
+        console.error("Error fetching the user details:", error);
+        throw error;
+    }
+}
+
+async function updateUserDetails(name, phone, id) {
+    try {
+        const result = await pool.query(UPDATE_USER_DETAILS, [name, phone, id]);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    } catch (error) {
+        console.error("Error updating the user details:", error);
+        throw error;
+    }
+}
+
+async function updatePassword(hashedPassword, userId) {
+    try {
+        const result = await pool.query(UPDATE_USER_PASSWORD, [hashedPassword, userId]);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    } catch (error) {
+        console.error("Error updating the user password:", error);
+        throw error;
+    }
+}
+
 async function promotion(userId) {
     try {
         const result = await pool.query(UPDATE_ROLE, [userId]);
@@ -113,4 +143,4 @@ async function promotion(userId) {
     }
 }
 
-module.exports = { pool, initializeDB, createUser, findUser, promotion };
+module.exports = { pool, updatePassword, updateUserDetails, initializeDB, createUser, findUser, promotion, profileInfo };

@@ -7,6 +7,8 @@ const CREATE_USERS_TABLE = `
         phone VARCHAR(20) UNIQUE,
         role VARCHAR(50) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'valet', 'admin')),
         profile_picture TEXT,
+        reset_token TEXT,
+        reset_token_expires TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -47,4 +49,22 @@ const UPDATE_ROLE = `
     UPDATE users SET role = 'admin' WHERE id = $1 RETURNING *
 `;
 
-module.exports = { CREATE_USERS_TABLE, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE };
+const FIND_USER_BY_ID = `
+    SELECT id, name, email, phone, role, profile_picture FROM users WHERE id = $1
+`;
+
+const UPDATE_USER_DETAILS = `
+    UPDATE users
+    SET
+       name = COALESCE($1, name),
+       phone = COALESCE($2, phone),
+       updated_at = CURRENT_TIMESTAMP
+    WHERE id = $3
+    RETURNING id, name, email, phone, role
+`;
+
+const UPDATE_USER_PASSWORD = `
+    UPDATE users SET password = $1 WHERE id = $2
+`;
+
+module.exports = { UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, FIND_USER_BY_ID, CREATE_USERS_TABLE, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE };

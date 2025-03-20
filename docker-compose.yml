@@ -103,6 +103,9 @@ services:
       KAFKA_GROUP_USER: ${KAFKA_GROUP_USER}
       PORT_USER: ${PORT_USER}
       JSONSECRET: ${JSONSECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_LOGIN: ${SMTP_LOGIN}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
     depends_on:
       postgres_db:
         condition: service_healthy
