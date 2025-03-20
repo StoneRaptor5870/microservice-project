@@ -28,8 +28,8 @@ router.delete('/admin/users/:userId', authenticateUser, authorizeRole("admin"), 
 // Vehicles
 router.post('/users/:userId/vehicles', authenticateUser, addVehicle);
 router.get('/users/:userId/vehicles', authenticateUser, getUserVehicles);
-router.get('/users/vehicles/:vehicleId', authenticateUser, getVehicleById);
-router.put('/users/vehicles/:vehicleId', authenticateUser, updateVehicle);
+router.get('/users/:userId/vehicles/:vehicleId', authenticateUser, getVehicleById);
+router.put('/users/:userId/vehicles/:vehicleId', authenticateUser, updateVehicle);
 router.delete('/users/:userId/vehicles/:vehicleId', authenticateUser, removeVehicle);
 
 // Valet

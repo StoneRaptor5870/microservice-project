@@ -49,6 +49,10 @@ const UPDATE_ROLE = `
     UPDATE users SET role = 'admin' WHERE id = $1 RETURNING *
 `;
 
+const UPDATE_ROLE_TO_USER = `
+    UPDATE users SET role = 'user' WHERE id = $1 RETURNING *
+`;
+
 const FIND_USER_BY_ID = `
     SELECT id, name, email, phone, role, profile_picture FROM users WHERE id = $1
 `;
@@ -67,4 +71,35 @@ const UPDATE_USER_PASSWORD = `
     UPDATE users SET password = $1 WHERE id = $2
 `;
 
-module.exports = { UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, FIND_USER_BY_ID, CREATE_USERS_TABLE, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE };
+const GET_ALL_USERS = `
+    SELECT id, name, email, phone, role, profile_picture FROM users
+`;
+
+const DELETE_USER_BY_ID = `DELETE FROM users WHERE id = $1`;
+
+const INSERT_VEHICLE_QUERY = `
+    INSERT INTO vehicles (user_id, licence_plate, make, model, colour)
+    VALUES ($1, $2, $3, $4, $5) RETURNING *
+`;
+
+const GET_USER_VEHICLES_QUERY = `
+    SELECT * FROM vehicles WHERE user_id = $1
+`;
+
+const GET_USER_VEHICLE_QUERY = `
+    SELECT * FROM vehicles WHERE user_id = $1 AND id = $2
+`;
+
+const UPDATE_VEHICLE_QUERY = `
+    UPDATE vehicles 
+    SET licence_plate = $1, make = $2, model = $3, colour = $4, updated_at = CURRENT_TIMESTAMP
+    WHERE id = $5 AND user_id = $6
+    RETURNING *
+`;
+
+const DELETE_VEHICLE_QUERY = `
+    DELETE FROM vehicles 
+    WHERE id = $1 AND user_id = $2
+`;
+
+module.exports = { DELETE_VEHICLE_QUERY, UPDATE_VEHICLE_QUERY, GET_USER_VEHICLE_QUERY, GET_USER_VEHICLES_QUERY, INSERT_VEHICLE_QUERY, DELETE_USER_BY_ID, GET_ALL_USERS, UPDATE_ROLE_TO_USER, UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, FIND_USER_BY_ID, CREATE_USERS_TABLE, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE };

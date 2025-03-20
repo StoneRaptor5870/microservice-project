@@ -1,5 +1,5 @@
 const { Pool } = require("pg");
-const { UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, CREATE_USERS_TABLE, FIND_USER_BY_ID, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE } = require("./queries");
+const { DELETE_VEHICLE_QUERY, UPDATE_VEHICLE_QUERY, GET_USER_VEHICLE_QUERY, GET_USER_VEHICLES_QUERY, INSERT_VEHICLE_QUERY, DELETE_USER_BY_ID, GET_ALL_USERS, UPDATE_ROLE_TO_USER, UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, CREATE_USERS_TABLE, FIND_USER_BY_ID, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE } = require("./queries");
 
 const pool = new Pool({
     user: process.env.POSTGRES_USER,
@@ -143,4 +143,93 @@ async function promotion(userId) {
     }
 }
 
-module.exports = { pool, updatePassword, updateUserDetails, initializeDB, createUser, findUser, promotion, profileInfo };
+async function demotion(userId) {
+    try {
+        const result = await pool.query(UPDATE_ROLE_TO_USER, [userId]);
+
+        if (result.rowCount === 0) {
+            throw new Error("User not found or already an user");
+        }
+
+        return;
+    } catch (error) {
+        console.error("Error promoting the user:", error);
+        throw error;
+    }
+}
+
+async function fetchAllUsers() {
+    try {
+        const result = await pool.query(GET_ALL_USERS);
+        return result.rows.length > 0 ? result.rows : null;
+    } catch (error) {
+        console.error("Error fetching all the users:", error);
+        throw error;
+    }
+}
+
+async function deleteUserById(id) {
+    try {
+        const result = await pool.query(DELETE_USER_BY_ID, [id]);
+        return result.rowCount > 0 ? true : false;
+    } catch (error) {
+        console.error("Error deleting the users:", error);
+        throw error;
+    }
+}
+
+async function addUserVehicle(userId, licencePlate, make, model, colour) {
+    try {
+        const result = await pool.query(INSERT_VEHICLE_QUERY, [
+            userId, licencePlate, make, model, colour
+        ]);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    } catch (error) {
+        console.error("Error adding the vehicle details:", error);
+        throw error;
+    }
+}
+
+async function userVehicles(userId) {
+    try {
+        const result = await pool.query(GET_USER_VEHICLES_QUERY, [userId]);
+        return result.rows.length > 0 ? result.rows : null;
+    } catch (error) {
+        console.error("Error getting the vehicle details:", error);
+        throw error;
+    }
+}
+
+async function userVehicle(userId, vehicleId) {
+    try {
+        const result = await pool.query(GET_USER_VEHICLE_QUERY, [userId, vehicleId]);
+        return result.rows.length > 0 ? result.rows : null;
+    } catch (error) {
+        console.error("Error getting the vehicle details:", error);
+        throw error;
+    }
+}
+
+async function updateUserVehicle(licencePlate, make, model, colour, vehicleId, userId) {
+    try {
+        const result = await pool.query(UPDATE_VEHICLE_QUERY, [
+            licencePlate, make, model, colour, vehicleId, userId
+        ]);
+        return result.rows.length > 0 ? result.rows[0] : null;
+    } catch (error) {
+        console.error("Error updating the vehicle details:", error);
+        throw error;
+    }
+}
+
+async function removeUserVehicle(vehicleId, userId) {
+    try {
+        const result = await pool.query(DELETE_VEHICLE_QUERY, [vehicleId, userId]);
+        return result.rowCount > 0 ? true : false;
+    } catch (error) {
+        console.error("Error deleting the vehicle details:", error);
+        throw error;
+    }
+}
+
+module.exports = { pool, removeUserVehicle, updateUserVehicle, userVehicle, userVehicles, addUserVehicle, deleteUserById, fetchAllUsers, demotion, updatePassword, updateUserDetails, initializeDB, createUser, findUser, promotion, profileInfo };
