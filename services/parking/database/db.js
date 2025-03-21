@@ -35,17 +35,19 @@ const ParkingSchema = new mongoose.Schema({
     garageId: { type: mongoose.Schema.Types.ObjectId, ref: "Garage", required: true },
     slotId: { type: mongoose.Schema.Types.ObjectId, ref: "Slot", required: true },
     vehicleId: { type: Number, required: true },
+    startTime: { type: Date, default: Date.now, required: true },
+    endTime: { type: Date },
     status: { 
         type: String, 
-        required: true,
-        enum: ['reserved', 'occupied', 'available', 'maintenance']
+        enum: ["active", "completed", "cancelled"], 
+        default: "active", 
+        required: true 
     },
-    assignedAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     pricePerHour: { type: Number, required: true },
     totalCharge: { type: Number },
     valetAssigned: { type: Number},
-});
+}, { timestamps: true });
 
 const GarageSchema = new mongoose.Schema({
     name: {type: String, required: true},
@@ -69,7 +71,7 @@ const SlotSchema = new mongoose.Schema({
     }
 });
 
-
+ParkingSchema.index({ userId: 1, vehicleId: 1 });
 ParkingSchema.index({ slotId: 1, status: 1 });
 
 const Parking = mongoose.model("Parking", ParkingSchema);
