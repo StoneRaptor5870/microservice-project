@@ -1,11 +1,14 @@
 const express = require('express');
+const morgan = require("morgan");
 const { connectKafka, subscribeToTopic } = require('./utils/kafka');
 const { connectDB } = require('./database/db');
-const parkingRoutes = require('./routes/parking')
+const parkingServiceRoutes = require('./routes/routes')
 const { handleUserRegistered } = require('./utils/KafkaHandlers')
 
 const app = express();
 app.use(express.json());
+
+app.use(morgan("dev"));
 
 // Initialise services
 async function initializeServices() {
@@ -36,7 +39,7 @@ async function initializeServices() {
 }
 
 // API Routes
-app.use('/api/v1', parkingRoutes);
+app.use('/api/v1', parkingServiceRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {

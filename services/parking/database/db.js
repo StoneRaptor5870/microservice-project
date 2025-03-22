@@ -52,8 +52,8 @@ const ParkingSchema = new mongoose.Schema({
 const GarageSchema = new mongoose.Schema({
     name: {type: String, required: true},
     location: {
-        latitude: { type: Number, required: true },
-        longitude: { type: Number, required: true }
+        type: { type: String, enum: ["Point"], default: "Point" },
+        coordinates: { type: [Number], required: true }, // [longitude, latitude]
     },
     totalSlots: { type: Number, required: true },
     availableSlots: { type: Number, required: true },
@@ -70,6 +70,8 @@ const SlotSchema = new mongoose.Schema({
         enum: ["available", "reserved", "occupied", "maintenance"]
     }
 });
+
+GarageSchema.index({ location: "2dsphere" });
 
 ParkingSchema.index({ userId: 1, vehicleId: 1 });
 ParkingSchema.index({ slotId: 1, status: 1 });

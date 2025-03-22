@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Garage, Slot } = require('../database/db');
 
-const mongoURI = '';
+const mongoURI = 'mongodb://localhost:27017/parking_db';
 
 const delhiGarages = [
     {
@@ -118,15 +118,27 @@ const delhiGarages = [
 
 async function insertGarages() {
     try {
-      await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
-      console.log('Connected to MongoDB');
+        await mongoose.connect(mongoURI);
+        console.log('Connected to MongoDB');
 
-      await Garage.insertMany(delhiGarages);
-      console.log('Data inserted successfully');
+        await Garage.updateMany({}, [
+            {
+                $set: {
+                    location: {
+                        type: "Point",
+                        coordinates: ["$location.longitude", "$location.latitude"]
+                    }
+                }
+            },
+            { $unset: ["location.latitude", "location.longitude"] }
+        ]);
 
-      mongoose.connection.close();
+        console.log('Updated garages to use GeoJSON location format');
     } catch (err) {
-      console.error('Error inserting data:', err);
+        console.error('Error inserting data:', err);
+    } finally {
+        mongoose.connection.close();
+        console.log("Disconnected from MongoDB");
     }
   }
 
