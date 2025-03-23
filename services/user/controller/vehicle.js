@@ -1,8 +1,9 @@
+const { publishMessage } = require("../utils/kafka");
 const { removeUserVehicle, profileInfo, addUserVehicle, userVehicles, userVehicle, updateUserVehicle } = require("../database/db");
 
 const addVehicle = async (req, res) => {
     const { userId } = req.params;
-    const { licencePlate, make, model, colour } = req.body;
+    const { licencePlate, make, model, colour, type } = req.body;
 
     try {
         const user = await profileInfo(userId);
@@ -11,7 +12,14 @@ const addVehicle = async (req, res) => {
             return res.status(404).json({ message: "User not found." });
         }
 
-        const vehicle = await addUserVehicle(userId, licencePlate, make, model, colour);
+        const vehicle = await addUserVehicle(userId, licencePlate, make, model, colour, type);
+
+        await publishMessage("VEHICLE_CREATED", {
+            id: vehicle.id,
+            userId: vehicle.user_id,
+            vehicleType: vehicle.type,
+            timestamp: new Date().toISOString()
+        });
 
         res.status(201).json({
             success: true,

@@ -1,4 +1,5 @@
 const { Kafka, Partitioners } = require("kafkajs");
+const { handleUserRegistered, handleVehicleRegistered } = require("./KafkaHandlers")
 
 const kafka = new Kafka({
     clientId: "parking-service-client",
@@ -50,26 +51,38 @@ async function publishMessage(topic, message) {
     }
 }
 
-async function subscribeToTopic(topic, handler) {
+async function startKafkaListeners() {
     try {
-        await consumer.subscribe({ topic, fromBeginning: true });
+        console.log("📡 Subscribing to Kafka topics...");
+
+        // Subscribe to multiple topics before starting the consumer
+        await consumer.subscribe({ topics: ["USER_CREATED", "VEHICLE_CREATED"], fromBeginning: true });
+
+        console.log("✅ Subscribed to topics: USER_CREATED, VEHICLE_CREATED");
+
+        // Start the consumer
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
                 try {
                     const parsedMessage = JSON.parse(message.value.toString());
                     console.log(`📩 Received message from ${topic}:`, parsedMessage);
-                    await handler(parsedMessage);
+
+                    if (topic === "USER_CREATED") {
+                        await handleUserRegistered(parsedMessage);
+                        console.log(`✅ Subscribed to topic: ${topic}`);
+                    } else if (topic === "VEHICLE_CREATED") {
+                        await handleVehicleRegistered(parsedMessage);
+                        console.log(`✅ Subscribed to topic: ${topic}`);
+                    }
                 } catch (error) {
-                    console.error('❌ Error processing message:', error);
+                    console.error("❌ Error processing message:", error);
                 }
             },
         });
-        console.log(`✅ Subscribed to topic: ${topic}`);
-        return true;
+
     } catch (error) {
-        console.error(`❌ Failed to subscribe to ${topic}:`, error);
-        return false;
+        console.error("❌ Error starting Kafka listeners:", error);
     }
 }
 
-module.exports = { kafka, producer, consumer, connectKafka, publishMessage, subscribeToTopic };
+module.exports = { kafka, producer, consumer, connectKafka, publishMessage, startKafkaListeners };

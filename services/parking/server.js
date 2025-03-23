@@ -1,9 +1,8 @@
 const express = require('express');
 const morgan = require("morgan");
-const { connectKafka, subscribeToTopic } = require('./utils/kafka');
+const { connectKafka, startKafkaListeners } = require('./utils/kafka');
 const { connectDB } = require('./database/db');
 const parkingServiceRoutes = require('./routes/routes')
-const { handleUserRegistered } = require('./utils/KafkaHandlers')
 
 const app = express();
 app.use(express.json());
@@ -23,7 +22,7 @@ async function initializeServices() {
         
         // Step 3: Subscribe to relevant topics
         console.log("Subscribing to Kafka topics...");
-        await subscribeToTopic('user_registered', handleUserRegistered);
+        await startKafkaListeners();
         
         // Step 4: Start the Express server
         const PORT = process.env.PORT_PARKING;

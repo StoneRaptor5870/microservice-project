@@ -30,6 +30,18 @@ const connectDB = async (retries = 5, delay = 3000) => {
     return false;
 };
 
+const UserSchema = new mongoose.Schema({
+    userId: { type: Number, required: true, unique: true },
+    name: { type: String, required: true },
+    email: { type: String, required: true }
+}, { timestamps: true });
+
+const VehicleSchema = new mongoose.Schema({
+    vehicleId: { type: Number, required: true, unique: true },
+    userId: { type: Number, required: true },
+    vehicleType: { type: String, required: true, enum: ["SUV", "Sedan", "Bike", "EV"] }
+}, { timestamps: true });
+
 const ParkingSchema = new mongoose.Schema({
     userId: { type: Number, required: true },
     garageId: { type: mongoose.Schema.Types.ObjectId, ref: "Garage", required: true },
@@ -47,7 +59,23 @@ const ParkingSchema = new mongoose.Schema({
     pricePerHour: { type: Number, required: true },
     totalCharge: { type: Number },
     valetAssigned: { type: Number},
-}, { timestamps: true });
+}, { toJSON: { virtuals: true}, toObject: { virtuals: true} }, { timestamps: true });
+
+// Virtual Reference to User
+ParkingSchema.virtual("user", {
+    ref: "User",
+    localField: "userId",
+    foreignField: "userId",
+    justOne: true
+});
+
+// Virtual Reference to Vehicle
+ParkingSchema.virtual("vehicle", {
+    ref: "Vehicle",
+    localField: "vehicleId",
+    foreignField: "vehicleId",
+    justOne: true
+});
 
 const GarageSchema = new mongoose.Schema({
     name: {type: String, required: true},
@@ -76,8 +104,10 @@ GarageSchema.index({ location: "2dsphere" });
 ParkingSchema.index({ userId: 1, vehicleId: 1 });
 ParkingSchema.index({ slotId: 1, status: 1 });
 
+const User = mongoose.model("User", UserSchema);
+const Vehicle = mongoose.model("Vehicle", VehicleSchema);
 const Parking = mongoose.model("Parking", ParkingSchema);
 const Garage = mongoose.model("Garage", GarageSchema);
 const Slot = mongoose.model("Slot", SlotSchema);
 
-module.exports = { connectDB, Parking, Garage, Slot };
+module.exports = { connectDB, User, Vehicle, Parking, Garage, Slot };

@@ -27,7 +27,7 @@ const register = async (req, res) => {
         const user = await createUser(name, email, hashedPassword, phone, "user");
 
         // Publish event to Kafka
-        await publishMessage("user_registered", {
+        await publishMessage("USER_CREATED", {
             id: user.id,
             name: user.name,
             email: user.email,

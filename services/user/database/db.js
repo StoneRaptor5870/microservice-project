@@ -1,5 +1,5 @@
 const { Pool } = require("pg");
-const { DELETE_VEHICLE_QUERY, UPDATE_VEHICLE_QUERY, GET_USER_VEHICLE_QUERY, GET_USER_VEHICLES_QUERY, INSERT_VEHICLE_QUERY, DELETE_USER_BY_ID, GET_ALL_USERS, UPDATE_ROLE_TO_USER, UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, CREATE_USERS_TABLE, FIND_USER_BY_ID, CREATE_VEHICLES_TABLE, CREATE_USER_TRANSACTIONS, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE } = require("./queries");
+const { DELETE_VEHICLE_QUERY, UPDATE_VEHICLE_QUERY, GET_USER_VEHICLE_QUERY, GET_USER_VEHICLES_QUERY, INSERT_VEHICLE_QUERY, DELETE_USER_BY_ID, GET_ALL_USERS, UPDATE_ROLE_TO_USER, UPDATE_USER_PASSWORD, UPDATE_USER_DETAILS, CREATE_USERS_TABLE, FIND_USER_BY_ID, CREATE_VEHICLES_TABLE, CREATE_USER, FIND_USER_BY_EMAIL, UPDATE_ROLE } = require("./queries");
 
 const pool = new Pool({
     user: process.env.POSTGRES_USER,
@@ -29,16 +29,6 @@ async function createVehicleTable() {
     }
 }
 
-async function createUserTransactionsTable() {
-    try {
-        await pool.query(CREATE_USER_TRANSACTIONS);
-        console.log("✅ User transactions table created successfully");
-    } catch (error) {
-        console.error("❌ Error creating User transactions table:", error);
-        throw error;
-    }
-}
-
 async function initializeDB(retries = 5, delay = 3000) {
     for (let i = 0; i < retries; i++) {
         try {
@@ -46,7 +36,6 @@ async function initializeDB(retries = 5, delay = 3000) {
             
             await createUsersTable();
             await createVehicleTable();
-            await createUserTransactionsTable();
             
             console.log("✅ Database initialized successfully");
             return true;
@@ -178,10 +167,10 @@ async function deleteUserById(id) {
     }
 }
 
-async function addUserVehicle(userId, licencePlate, make, model, colour) {
+async function addUserVehicle(userId, licencePlate, make, model, colour, type) {
     try {
         const result = await pool.query(INSERT_VEHICLE_QUERY, [
-            userId, licencePlate, make, model, colour
+            userId, licencePlate, make, model, colour, type
         ]);
         return result.rows.length > 0 ? result.rows[0] : null;
     } catch (error) {
