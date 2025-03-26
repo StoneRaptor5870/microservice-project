@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { authenticateToken, authorizeRole } = require('../middleware/auth');
-const { reserveSlot } = require('../controller/parking')
+const { reserveSlot, listAvailableSlots, listParkingPricing, getAllReservations, getAllReservationsOfUser, getReservationById, updateReservationDetails, cancelReservationRequest } = require('../controller/parking')
 const { createGarage, getAllGarages, getGarage, updateGarage, deleteGarage, getAvailableSlotsByGarage, searchGaragesByLocation } = require("../controller/garages");
 const { createSlot, getAllSlots, getSlotsByGarage, getSlotById, updateSlot, deleteSlot } = require("../controller/slots");
 
@@ -24,6 +24,17 @@ router.put('/parking/slots/:slotId', authenticateToken, authorizeRole("admin"), 
 router.delete('/parking/slots/:slotId', authenticateToken, authorizeRole("admin"), deleteSlot);
 
 // Reservations
-router.post('/reserve-slot', authenticateToken, reserveSlot);
+router.post('/parking/reserveSlot', authenticateToken, reserveSlot);
+router.get('/parking/reserveSlot', authenticateToken, getAllReservations);
+router.get('/parking/reservations/user/:userId', authenticateToken, getAllReservationsOfUser);
+router.get('/parking/reservations/:reservationId', authenticateToken, getReservationById);
+router.put('/parking/reservations/:reservationId', authenticateToken, updateReservationDetails);
+router.delete('/parking/reservations/:reservationId', authenticateToken, cancelReservationRequest);
+
+// Availability & Pricing
+
+router.get('/parking/availability', listAvailableSlots);
+// router.get('/parking/availability/:slotType', listAvailableSlotsByType); query params: ?garageId=xyz&slotType=compact
+router.get('/parking/pricing', listParkingPricing);
 
 module.exports = router;
