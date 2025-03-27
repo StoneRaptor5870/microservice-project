@@ -1,3 +1,4 @@
 /node_modules
 .env
 newStuff.md
+/routes/routes.txt

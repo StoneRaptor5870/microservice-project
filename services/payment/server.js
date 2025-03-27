@@ -27,7 +27,7 @@ async function initializeServices() {
         // Step 4: Start the Express server
         const PORT = process.env.PORT_PAYMENT;
         app.listen(PORT, () => {
-            console.log(`🚀 Parking Service running on port ${PORT}`);
+            console.log(`🚀 Payment Service running on port ${PORT}`);
         });
         
         return true;
