@@ -138,6 +138,31 @@ services:
       - app-network
     restart: on-failure
 
+  # Payment Service
+  payment-service:
+    build:
+      context: ./services/payment
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_GROUP_PAYMENT: ${KAFKA_GROUP_PAYMENT}
+      PORT_PAYMENT: ${PORT_PAYMENT}
+      JSONSECRET: ${JSONSECRET}
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "3003:3003"
+    networks:
+      - app-network
+    restart: on-failure
+
 networks:
   app-network:
     driver: bridge

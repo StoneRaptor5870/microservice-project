@@ -17,7 +17,7 @@ const reserveSlot = async (req, res) => {
             userId, vehicleId, garageId, slotId, pricePerHour, endTime
         });
 
-        await publishMessage('slot_reserved', {
+        await publishMessage('SLOT_RESERVED', {
             slotId: reservation.slotId,
             userId: reservation.userId,
             vehicleId: reservation.vehicleId,
