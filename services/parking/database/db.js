@@ -33,12 +33,14 @@ const connectDB = async (retries = 5, delay = 3000) => {
 const UserSchema = new mongoose.Schema({
     userId: { type: Number, required: true, unique: true },
     name: { type: String, required: true },
-    email: { type: String, required: true }
+    email: { type: String, required: true },
+    phone: { type: String, required: true }
 }, { timestamps: true });
 
 const VehicleSchema = new mongoose.Schema({
     vehicleId: { type: Number, required: true, unique: true },
     userId: { type: Number, required: true },
+    licencePlate: { type: String, reqired: true },
     vehicleType: { type: String, required: true, enum: ["SUV", "Sedan", "Bike", "EV"] }
 }, { timestamps: true });
 

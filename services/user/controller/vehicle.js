@@ -18,6 +18,7 @@ const addVehicle = async (req, res) => {
             id: vehicle.id,
             userId: vehicle.user_id,
             vehicleType: vehicle.type,
+            licencePlate: vehicle.licence_plate,
             timestamp: new Date().toISOString()
         });
 

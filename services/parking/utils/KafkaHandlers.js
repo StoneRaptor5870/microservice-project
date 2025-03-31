@@ -12,6 +12,7 @@ async function handleUserRegistered(message) {
                 userId: message.id,
                 name: message.name,
                 email: message.email,
+                phone: message.phone
             });
 
             console.log(`✅ User ${message.id} stored in MongoDB.`);
@@ -34,6 +35,7 @@ async function handleVehicleRegistered(message) {
                 vehicleId: message.id,
                 userId: message.userId,
                 vehicleType: message.vehicleType,
+                licencePlate: message.licencePlate
             });
 
             console.log(`✅ Vehicle ${message.id} stored in MongoDB.`);

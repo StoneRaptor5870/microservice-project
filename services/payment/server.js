@@ -3,8 +3,10 @@ const morgan = require("morgan");
 const { connectKafka, startKafkaListeners } = require('./utils/kafka');
 const { initializeDB } = require('./database/db');
 const paymentServiceRoutes = require('./routes/routes')
+const { handleStripeWebhook } = require('./controller/webhook');
 
 const app = express();
+app.use('/stripe/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
 app.use(express.json());
 
 app.use(morgan("dev"));
@@ -12,8 +14,8 @@ app.use(morgan("dev"));
 // Initialise services
 async function initializeServices() {
     try {
-        // Step 1: Connect to MongoDB
-        console.log("Connecting to MongoDB...");
+        // Step 1: Connect to Postgres
+        console.log("Connecting to Postgres...");
         await initializeDB();
         
         // Step 2: Connect to Kafka
